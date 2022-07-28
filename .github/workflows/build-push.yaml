@@ -1,0 +1,46 @@
+name: Build geth docker image
+
+
+env:
+  DEFAULT_REPO: "blockscout/blockscout"
+  DEFAULT_BRANCH: "master"
+
+on:
+  workflow_dispatch:
+    inputs:
+      repository:
+        description: The origin git repository
+        default: blockscout/blockscout
+        required: true
+      commitRef:
+        description: The branch, tag or commit hash to checkout
+        default: master
+        required: true
+
+jobs:
+  git-sync:
+    name: git-sync
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the blockscout repository
+        uses: actions/checkout@v2
+        with:
+          repository: ${{ github.event.inputs.repository || env.DEFAULT_REPO }}
+          ref: ${{ github.event.inputs.commitRef || env.DEFAULT_BRANCH }}
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Docker build and push
+        id: docker_build
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          file: ./docker/Dockerfile
+          build-args:
+          - COIN=ETH
+          tags: skylenet/blockscout:${{ github.event.inputs.commitRef || env.DEFAULT_BRANCH }}
+          push: true
