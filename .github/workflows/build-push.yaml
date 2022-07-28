@@ -19,7 +19,7 @@ on:
 
 jobs:
   build-docker-container:
-    name: Build docker - ${{ github.event.inputs.repository || env.DEFAULT_REPO }}/${{ github.event.inputs.commitRef || env.DEFAULT_BRANCH }}
+    name: Build docker container image
     runs-on: ubuntu-latest
     steps:
       - name: Check out the blockscout repository
