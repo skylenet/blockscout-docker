@@ -1,4 +1,4 @@
-name: Build geth docker image
+name: Build blockscout docker image
 
 
 env:
